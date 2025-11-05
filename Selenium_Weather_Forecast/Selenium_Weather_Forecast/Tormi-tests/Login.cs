@@ -1,7 +1,9 @@
-﻿using NUnit.Framework;
+﻿using Microsoft.Testing.Platform.Extensions.Messages;
+using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
+using SeleniumExtras.WaitHelpers;
 
 namespace Selenium_Weather_Forecast.Tormi_tests
 {
@@ -17,24 +19,24 @@ namespace Selenium_Weather_Forecast.Tormi_tests
         [Test]
         public void Test()
         {
-            driver.FindElement(By.XPath("//*[contains(text(), 'Register') and contains(@class, 'btn-primary')]")).Click();
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
+
+            wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[contains(text(), 'Register') and contains(@class, 'btn-primary')]"))).Click();
+
             string username = Guid.NewGuid().ToString();
-            driver.FindElement(By.Id("Username")).SendKeys(username);
+            wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("Username"))).SendKeys(username);
             driver.FindElement(By.Id("Password")).SendKeys("Abc-1");
             driver.FindElement(By.Id("ConfirmPassword")).SendKeys("Abc-1");
             driver.FindElement(By.XPath("//*[contains(@class, 'btn-primary')]")).Submit();
-            IWebElement successHeader = driver.FindElement(By.CssSelector("h1"));
 
-            Assert.That(successHeader.Text == "You have successfully registered your account, please log in with it");
+            Assert.That(wait.Until(ExpectedConditions.TextToBePresentInElementLocated(By.CssSelector("h1"), "You have successfully registered your account, please log in with it")));
 
-            driver.FindElement(By.XPath("//*[contains(text(), 'Login') and contains(@class, 'nav-link')]")).Click();
+            wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[contains(text(), 'Login') and contains(@class, 'nav-link')]"))).Click();
             driver.FindElement(By.Id("Username")).SendKeys(username);
             driver.FindElement(By.Id("Password")).SendKeys("Abc-1");
             driver.FindElement(By.XPath("//*[contains(@class, 'btn-primary')]")).Submit();
 
-            IWebElement heading = driver.FindElement(By.CssSelector("h1"));
-            Assert.That(heading.Displayed == true);
-            Assert.That(heading.Text == "Welcome to the weather forecast app");
+            Assert.That(wait.Until(ExpectedConditions.TextToBePresentInElementLocated(By.CssSelector("h1"), "Welcome to the weather forecast app")));
         }
         [TearDown]
         public void EndTest()

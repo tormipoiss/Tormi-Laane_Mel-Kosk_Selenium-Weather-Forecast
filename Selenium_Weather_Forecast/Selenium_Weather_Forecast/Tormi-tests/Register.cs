@@ -1,6 +1,8 @@
 ﻿using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support.UI;
+using SeleniumExtras.WaitHelpers;
 
 namespace Selenium_Weather_Forecast.Tormi_tests
 {
@@ -16,14 +18,16 @@ namespace Selenium_Weather_Forecast.Tormi_tests
         [Test]
         public void Test()
         {
-            driver.FindElement(By.XPath("//*[contains(text(), 'Register') and contains(@class, 'btn-primary')]")).Click();
-            driver.FindElement(By.Id("Username")).SendKeys(Guid.NewGuid().ToString());
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
+
+            wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[contains(text(), 'Register') and contains(@class, 'btn-primary')]"))).Click();
+
+            wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("Username"))).SendKeys(Guid.NewGuid().ToString());
             driver.FindElement(By.Id("Password")).SendKeys("Abc-1");
             driver.FindElement(By.Id("ConfirmPassword")).SendKeys("Abc-1");
             driver.FindElement(By.XPath("//*[contains(@class, 'btn-primary')]")).Submit();
-            IWebElement successHeader = driver.FindElement(By.CssSelector("h1"));
 
-            Assert.That(successHeader.Text == "You have successfully registered your account, please log in with it");
+            Assert.That(wait.Until(ExpectedConditions.TextToBePresentInElementLocated(By.CssSelector("h1"), "You have successfully registered your account, please log in with it")));
         }
         [TearDown]
         public void EndTest()

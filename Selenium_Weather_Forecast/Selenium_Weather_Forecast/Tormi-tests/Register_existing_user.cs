@@ -1,6 +1,8 @@
 ﻿using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support.UI;
+using SeleniumExtras.WaitHelpers;
 
 namespace Selenium_Weather_Forecast.Tormi_tests
 {
@@ -16,23 +18,26 @@ namespace Selenium_Weather_Forecast.Tormi_tests
         [Test]
         public void Test()
         {
-            driver.FindElement(By.XPath("//*[contains(text(), 'Register') and contains(@class, 'btn-primary')]")).Click();
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
+
+            wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[contains(text(), 'Register') and contains(@class, 'btn-primary')]"))).Click();
+
             string username = Guid.NewGuid().ToString();
-            driver.FindElement(By.Id("Username")).SendKeys(username);
-            driver.FindElement(By.Id("Password")).SendKeys("Abc-1");
-            driver.FindElement(By.Id("ConfirmPassword")).SendKeys("Abc-1");
-            driver.FindElement(By.XPath("//*[contains(@class, 'btn-primary')]")).Submit();
-            IWebElement successHeader = driver.FindElement(By.CssSelector("h1"));
-
-            Assert.That(successHeader.Text == "You have successfully registered your account, please log in with it");
-
-            driver.FindElement(By.XPath("//*[contains(text(), 'Register') and contains(@class, 'nav-link')]")).Click();
-            driver.FindElement(By.Id("Username")).SendKeys(username);
+            wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("Username"))).SendKeys(username);
             driver.FindElement(By.Id("Password")).SendKeys("Abc-1");
             driver.FindElement(By.Id("ConfirmPassword")).SendKeys("Abc-1");
             driver.FindElement(By.XPath("//*[contains(@class, 'btn-primary')]")).Submit();
 
-            Assert.That(driver.FindElement(By.CssSelector(".text-danger ul li")).Text == "This username is already taken., Please choose another one!");
+            Assert.That(wait.Until(ExpectedConditions.TextToBePresentInElementLocated(By.CssSelector("h1"), "You have successfully registered your account, please log in with it")));
+
+            wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[contains(text(), 'Register') and contains(@class, 'nav-link')]"))).Click();
+
+            wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("Username"))).SendKeys(username);
+            driver.FindElement(By.Id("Password")).SendKeys("Abc-1");
+            driver.FindElement(By.Id("ConfirmPassword")).SendKeys("Abc-1");
+            driver.FindElement(By.XPath("//*[contains(@class, 'btn-primary')]")).Submit();
+
+            Assert.That(wait.Until(ExpectedConditions.TextToBePresentInElementLocated(By.CssSelector(".text-danger ul li"), "This username is already taken., Please choose another one!")));
         }
         [TearDown]
         public void EndTest()
