@@ -19,8 +19,17 @@ namespace Selenium_Weather_Forecast.Tormi_tests
         [Test]
         public void Test()
         {
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
+            LoginInitialize(driver);
+        }
+        [TearDown]
+        public void EndTest()
+        {
+            driver.Close();
+        }
 
+        public static void LoginInitialize(IWebDriver driver)
+        {
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
             wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[contains(text(), 'Register') and contains(@class, 'btn-primary')]"))).Click();
 
             string username = Guid.NewGuid().ToString();
@@ -37,11 +46,6 @@ namespace Selenium_Weather_Forecast.Tormi_tests
             driver.FindElement(By.XPath("//*[contains(@class, 'btn-primary')]")).Submit();
 
             Assert.That(wait.Until(ExpectedConditions.TextToBePresentInElementLocated(By.CssSelector("h1"), "Welcome to the weather forecast app")));
-        }
-        [TearDown]
-        public void EndTest()
-        {
-            driver.Close();
         }
     }
 }
