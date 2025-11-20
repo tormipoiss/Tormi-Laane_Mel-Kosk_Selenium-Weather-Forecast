@@ -1,17 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using OpenQA.Selenium;
 using SeleniumExtras.WaitHelpers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Selenium_Weather_Forecast.Mel_tests
 {
-    internal class Map_location
+    internal class No_shared_links
     {
         IWebDriver driver;
         [SetUp]
@@ -45,18 +46,10 @@ namespace Selenium_Weather_Forecast.Mel_tests
             Assert.That(heading.Displayed == true);
             Assert.That(heading.Text == "Welcome to the weather forecast app");
 
-             
-            driver.FindElement(By.XPath("//span[text()='Choose location on map']")).Click();
-            driver.FindElement(By.Id("map")).Click();
-            Thread.Sleep(100);
-            driver.FindElement(By.Id("submitLocation")).Click();
-            driver.FindElement(By.XPath("//span[text()='Search specific day']")).Click();
-            wait.Until(ExpectedConditions.ElementExists(By.Id("weatherAddress")));
-
-            string realPlace = driver.FindElement(By.Id("weatherAddress")).Text;
-            Assert.That(driver.Url == "https://localhost:5001/Home/City");
-            Assert.That(realPlace.Contains("Tallinn"));
-
+            driver.FindElement(By.XPath("//a[contains(text(),'Shared link statistics')]")).Click();
+            var alert = wait.Until(ExpectedConditions.AlertIsPresent());
+            Assert.That(alert.Text == "No shared links to display");
+            alert.Accept();
         }
         [TearDown]
         public void EndTest()

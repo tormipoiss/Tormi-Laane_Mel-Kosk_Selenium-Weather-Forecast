@@ -17,7 +17,7 @@ namespace Selenium_Weather_Forecast.Mel_tests
         [SetUp]
         public void Initialize()
         {
-            driver = new ChromeDriver("./chromedriver.exe");
+            driver = new ChromeDriver();
             driver.Url = "https://localhost:5001/";
             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5);
         }
