@@ -27,7 +27,7 @@ namespace Selenium_Weather_Forecast.Tormi_tests
             driver.FindElement(By.Id("DayAmount")).SendKeys("100");
             driver.FindElement(By.XPath("//span[text()='Search multiple days']")).Click();
 
-            Assert.That(wait.Until(ExpectedConditions.TextToBePresentInElementLocated(By.XPath("//p[text()='Cannot forecast weather longer than 14 days, defaulted to day 14']"), "Cannot forecast weather longer than 14 days, defaulted to day 14")));
+            Assert.That(wait.Until(ExpectedConditions.TextToBePresentInElementLocated(By.XPath("//p[text()='Cannot forecast weather longer than 15 days, defaulted to day 15']"), "Cannot forecast weather longer than 15 days, defaulted to day 15")));
 
             Assert.That(wait.Until(ExpectedConditions.TextToBePresentInElementLocated(By.Id("multipleDayAddress"), "Tallinn")));
 
