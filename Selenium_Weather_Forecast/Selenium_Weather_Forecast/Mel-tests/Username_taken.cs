@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Selenium_Weather_Forecast.Mel_tests
 {
-    internal class Correct_place_from_IP
+    internal class Username_taken
     {
         IWebDriver driver;
         [SetUp]
@@ -37,28 +37,14 @@ namespace Selenium_Weather_Forecast.Mel_tests
             IWebElement successHeader = driver.FindElement(By.XPath("/html/body/div/main/h1"));
             Assert.That(successHeader.Text == "You have successfully registered your account, please log in with it");
 
-            driver.FindElement(By.XPath("//*[contains(text(), 'Login') and contains(@class, 'nav-link')]")).Click();
+            driver.Navigate().GoToUrl("https://localhost:5001/Account/Register");
+
             driver.FindElement(By.Id("Username")).SendKeys(username);
             driver.FindElement(By.Id("Password")).SendKeys("Abba@Babba22");
-            driver.FindElement(By.XPath("//*[contains(@class, 'btn-primary')]")).Submit();
-            IWebElement heading = driver.FindElement(By.ClassName("display-4"));
-            Assert.That(heading.Displayed == true);
-            Assert.That(heading.Text == "Welcome to the weather forecast app");
+            driver.FindElement(By.Id("ConfirmPassword")).SendKeys("Abba@Babba22");
 
-            driver.FindElement(By.XPath("//span[text()='Get my location']")).Click();
-            string placeFromIp = wait.Until(driver =>
-            {
-                IWebElement element = driver.FindElement(By.Id("cityNameInput"));
-                string value = element.GetAttribute("value");
-                if (!string.IsNullOrEmpty(value))
-                {
-                    return value;
-                }
-                return null;
-            });
-            Assert.That(driver.Url == "https://localhost:5001/Home/City");
-            Assert.That(placeFromIp == "Tallinn");
-
+            driver.FindElement(By.XPath("//*[contains(text(), 'Register') and contains(@class, 'btn-primary')]")).Click();
+            Assert.That(wait.Until(ExpectedConditions.TextToBePresentInElementLocated(By.CssSelector(".text-danger ul li"), "This username is already taken., Please choose another one!")));
         }
         [TearDown]
         public void EndTest()

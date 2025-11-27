@@ -55,6 +55,7 @@ namespace Selenium_Weather_Forecast.Mel_tests
         public void EndTest()
         {
             driver.Close();
+            driver.Quit();
         }
     }
 }

@@ -1,17 +1,18 @@
-﻿using NUnit.Framework;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using NUnit.Framework;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using OpenQA.Selenium;
 using SeleniumExtras.WaitHelpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Selenium_Weather_Forecast.Mel_tests
 {
-    internal class Correct_place_from_IP
+    internal class Are_maps_showing
     {
         IWebDriver driver;
         [SetUp]
@@ -45,19 +46,25 @@ namespace Selenium_Weather_Forecast.Mel_tests
             Assert.That(heading.Displayed == true);
             Assert.That(heading.Text == "Welcome to the weather forecast app");
 
-            driver.FindElement(By.XPath("//span[text()='Get my location']")).Click();
-            string placeFromIp = wait.Until(driver =>
-            {
-                IWebElement element = driver.FindElement(By.Id("cityNameInput"));
-                string value = element.GetAttribute("value");
-                if (!string.IsNullOrEmpty(value))
-                {
-                    return value;
-                }
-                return null;
-            });
+            driver.FindElement(By.Id("cityNameInput")).SendKeys("Tallinn");
+            driver.FindElement(By.XPath("//span[text()='Search specific day']")).Click();
+            wait.Until(ExpectedConditions.ElementExists(By.Id("weatherAddress")));
+
+            string realPlace = driver.FindElement(By.Id("weatherAddress")).Text;
             Assert.That(driver.Url == "https://localhost:5001/Home/City");
-            Assert.That(placeFromIp == "Tallinn");
+            Assert.That(realPlace == "Tallinn");
+            string[] buttons = new string[] { "weatherGraphSpan", "googlemapSpan", "lightningmapSpan", "weathermapSpan" };
+            string[] showNames = new string[] { "Show weather graph", "Show google map", "Show lightning map", "Show weather map" };
+            string[] closeNames = new string[] { "Hide weather graph", "Hide google map", "Hide lightning map", "Hide weather map" };
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                var btn = driver.FindElement(By.Id(buttons[i]));
+                Assert.That(btn.Text == showNames[i]);
+                btn.Click();
+                Assert.That(btn.Text == closeNames[i]);
+                btn.Click();
+                Assert.That(btn.Text == showNames[i]);
+            }
 
         }
         [TearDown]

@@ -1,17 +1,17 @@
-﻿using NUnit.Framework;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
-using OpenQA.Selenium;
-using SeleniumExtras.WaitHelpers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NUnit.Framework;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support.UI;
+using OpenQA.Selenium;
+using SeleniumExtras.WaitHelpers;
 
 namespace Selenium_Weather_Forecast.Mel_tests
 {
-    internal class Correct_place_from_IP
+    internal class Specific_day
     {
         IWebDriver driver;
         [SetUp]
@@ -44,20 +44,20 @@ namespace Selenium_Weather_Forecast.Mel_tests
             IWebElement heading = driver.FindElement(By.ClassName("display-4"));
             Assert.That(heading.Displayed == true);
             Assert.That(heading.Text == "Welcome to the weather forecast app");
-
-            driver.FindElement(By.XPath("//span[text()='Get my location']")).Click();
-            string placeFromIp = wait.Until(driver =>
+            string[] split = DateTime.Now.AddHours(5).ToString("dd:MM:yyyy:HH:mm").Split(":");
+            var forecast = driver.FindElement(By.Id("ForecastDate"));
+            for (int i = 0; i < split.Length; i++)
             {
-                IWebElement element = driver.FindElement(By.Id("cityNameInput"));
-                string value = element.GetAttribute("value");
-                if (!string.IsNullOrEmpty(value))
-                {
-                    return value;
-                }
-                return null;
-            });
+                if (i == 3) forecast.SendKeys(Keys.Tab);
+                forecast.SendKeys(split[i]);
+            }
+            driver.FindElement(By.Id("cityNameInput")).SendKeys("Tallinn");
+            driver.FindElement(By.XPath("//span[text()='Search specific day']")).Click();
+            wait.Until(ExpectedConditions.ElementExists(By.Id("weatherAddress")));
+
+            string realPlace = driver.FindElement(By.Id("weatherAddress")).Text;
             Assert.That(driver.Url == "https://localhost:5001/Home/City");
-            Assert.That(placeFromIp == "Tallinn");
+            Assert.That(realPlace == "Tallinn");
 
         }
         [TearDown]

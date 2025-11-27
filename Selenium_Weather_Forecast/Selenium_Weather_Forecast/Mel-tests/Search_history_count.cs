@@ -1,17 +1,17 @@
-﻿using NUnit.Framework;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
-using OpenQA.Selenium;
-using SeleniumExtras.WaitHelpers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NUnit.Framework;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support.UI;
+using OpenQA.Selenium;
+using SeleniumExtras.WaitHelpers;
 
 namespace Selenium_Weather_Forecast.Mel_tests
 {
-    internal class Correct_place_from_IP
+    internal class Search_history_count
     {
         IWebDriver driver;
         [SetUp]
@@ -45,19 +45,25 @@ namespace Selenium_Weather_Forecast.Mel_tests
             Assert.That(heading.Displayed == true);
             Assert.That(heading.Text == "Welcome to the weather forecast app");
 
-            driver.FindElement(By.XPath("//span[text()='Get my location']")).Click();
-            string placeFromIp = wait.Until(driver =>
+            void Search(string place)
             {
-                IWebElement element = driver.FindElement(By.Id("cityNameInput"));
-                string value = element.GetAttribute("value");
-                if (!string.IsNullOrEmpty(value))
-                {
-                    return value;
-                }
-                return null;
-            });
-            Assert.That(driver.Url == "https://localhost:5001/Home/City");
-            Assert.That(placeFromIp == "Tallinn");
+                driver.FindElement(By.Id("cityNameInput")).SendKeys(place);
+                driver.FindElement(By.XPath("//span[text()='Search specific day']")).Click();
+                wait.Until(ExpectedConditions.ElementExists(By.Id("weatherAddress")));
+                Thread.Sleep(100);
+                string realPlace = driver.FindElement(By.Id("weatherAddress")).Text;
+                Assert.That(driver.Url == "https://localhost:5001/Home/City");
+                Assert.That(realPlace == place);
+                driver.FindElement(By.Id("cityNameInput")).Clear();
+            }
+            string[] places = new string[] { "Tallinn", "Pärnu", "Paris" };
+            foreach(var place in places)
+            {
+                Search(place);
+            }
+            driver.FindElement(By.XPath("//span[text()='Get Search History']")).Click();
+            int tbCount = driver.FindElements(By.CssSelector("td[style*=\"text-align: left; word-wrap: break-word;\"]")).Count;
+            Assert.That(tbCount == places.Length);
 
         }
         [TearDown]

@@ -7,11 +7,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Selenium_Weather_Forecast.Mel_tests
 {
-    internal class Correct_place_from_IP
+    internal class Radware_map
     {
         IWebDriver driver;
         [SetUp]
@@ -45,20 +46,21 @@ namespace Selenium_Weather_Forecast.Mel_tests
             Assert.That(heading.Displayed == true);
             Assert.That(heading.Text == "Welcome to the weather forecast app");
 
-            driver.FindElement(By.XPath("//span[text()='Get my location']")).Click();
-            string placeFromIp = wait.Until(driver =>
+            driver.FindElement(By.XPath("//a[contains(text(),'Digital Weather')]")).Click();
+            wait.Until(ExpectedConditions.VisibilityOfAllElementsLocatedBy(By.XPath("//span[contains(text(),'Radware threat map')]")));
+            driver.FindElement(By.XPath("//span[contains(text(),'Radware threat map')]")).Click();
+            try
             {
-                IWebElement element = driver.FindElement(By.Id("cityNameInput"));
-                string value = element.GetAttribute("value");
-                if (!string.IsNullOrEmpty(value))
+                wait.Until(ExpectedConditions.VisibilityOfAllElementsLocatedBy(By.XPath("//iframe[@src='https://livethreatmap.radware.com/']")));
+                Assert.Pass();
+            }
+            catch(Exception ex)
+            {
+                if(ex is not SuccessException)
                 {
-                    return value;
+                    Assert.Fail(ex.ToString());
                 }
-                return null;
-            });
-            Assert.That(driver.Url == "https://localhost:5001/Home/City");
-            Assert.That(placeFromIp == "Tallinn");
-
+            }
         }
         [TearDown]
         public void EndTest()
